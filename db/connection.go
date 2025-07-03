@@ -21,6 +21,7 @@ func ConnectionDB(dsn string) error {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 	Database.AutoMigrate(&models.User{})
+	Database.AutoMigrate(&models.Login{})
 	log.Println("Database connected successfully!")
 	log.Println("Database migration complete.")
 	return nil

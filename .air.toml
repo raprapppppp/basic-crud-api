@@ -1,0 +1,15 @@
+# .air.toml
+root = "."
+tmp_dir = "tmp"
+
+[build]
+  cmd = "go build -o ./tmp/main.exe"
+  bin = "tmp/main.exe"
+  include_ext = ["go"]
+  exclude_dir = ["vendor", "tmp"]
+  exclude_file = []
+  follow_symlink = true
+  delay = 1000 # ms
+
+[log]
+  time = true

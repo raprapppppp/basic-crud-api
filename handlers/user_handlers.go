@@ -63,3 +63,21 @@ func DeleteUser(h *fiber.Ctx) error {
 	return h.SendStatus(200)
 
 }
+
+func AddLoginUser(h *fiber.Ctx) error {
+	user := new(models.Login)
+
+	err := h.BodyParser(user)
+	if err != nil {
+		return h.Status(503).SendString(err.Error())
+	}
+	db.Database.Create(&user)
+
+	return h.Status(fiber.StatusOK).JSON(user)
+
+}
+
+func GetLoginUser(h *fiber.Ctx) error {
+	return nil
+
+}
