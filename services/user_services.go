@@ -3,46 +3,39 @@ package services
 
 import (
 	"go_fiber/models"
-
-	"gorm.io/gorm"
+	"go_fiber/repo"
 )
 
-// UserService defines the interface for user-related operations.
-// This makes your code more testable and flexible.
-type UserService interface {
-	CreateUser(user *models.User) error
-	GetUserByID(id uint) (*models.User, error)
-	// Add more methods like UpdateUser, DeleteUser, ListUsers etc.
+// injcting UserRepo interfaces
+type UserService struct {
+	service repo.UserRepo
 }
 
-// userService implements UserService using GORM.
-type userService struct {
-	db *gorm.DB
+// interfaces contains all mthod available on services
+type UserServiceDepend interface {
+	FindAll() ([]models.User, error)
+	CreateUser(user models.User) (models.User, error)
+	UpdateUser(user models.User, id int) (models.User, error)
+	DeleteUser(user models.User, id int) error
 }
 
-// NewUserService creates a new instance of UserService.
-// It takes the GORM DB client as a dependency.
-func NewUserService(db *gorm.DB) UserService {
-	return &userService{db: db}
+// Init
+func UserServiceInit(r repo.UserRepo) UserServiceDepend {
+	return &UserService{r}
 }
 
-// CreateUser handles the creation of a new user in the database.
-func (s *userService) CreateUser(user *models.User) error {
-	// GORM's Create method directly saves the user and updates the user.ID
-	result := s.db.Create(user)
-	if result.Error != nil {
-		return result.Error
-	}
-	// No need to set user.ID here, GORM does it automatically if primaryKey is setup.
-	return nil
+func (s *UserService) FindAll() ([]models.User, error) {
+	return s.service.FindAll()
 }
 
-// GetUserByID retrieves a user by their ID.
-func (s *userService) GetUserByID(id uint) (*models.User, error) {
-	user := &models.User{}
-	result := s.db.First(user, id)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-	return user, nil
+func (s *UserService) CreateUser(user models.User) (models.User, error) {
+	return s.service.CreateUser(user)
+}
+
+func (s *UserService) UpdateUser(user models.User, id int) (models.User, error) {
+	return s.service.UpdateUser(user, id)
+}
+
+func (s *UserService) DeleteUser(user models.User, id int) error {
+	return s.service.DeleteUser(user, id)
 }
