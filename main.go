@@ -8,6 +8,7 @@ import (
 	"log"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 func main() {
@@ -20,6 +21,7 @@ func main() {
 	userhandler := handlers.NewUserHandler(userService)
 
 	app := fiber.New()
+	app.Use(cors.New())
 
 	app.Get("/users", userhandler.Getuser)
 	// app.Get("/users/:id", handlers.GetUserById)
@@ -27,5 +29,5 @@ func main() {
 	app.Put("/users/update/:id", userhandler.UpdateUser)
 	app.Delete("/users/delete/:id", userhandler.DeleteUser)
 
-	log.Fatal(app.Listen(":3000"))
+	log.Fatal(app.Listen(":3001"))
 }

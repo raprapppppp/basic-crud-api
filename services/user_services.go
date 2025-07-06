@@ -13,10 +13,10 @@ type UserService struct {
 
 // interfaces contains all mthod available on services
 type UserServiceDepend interface {
-	FindAll() ([]models.User, error)
-	CreateUser(user models.User) (models.User, error)
-	UpdateUser(user models.User, id int) (models.User, error)
-	DeleteUser(user models.User, id int) error
+	FindAll() ([]models.Users, error)
+	CreateUser(user models.Users) (models.Users, error)
+	UpdateUser(user models.Users, id int) (models.Users, error)
+	DeleteUser(user models.Users, id int) error
 }
 
 // Init
@@ -24,18 +24,18 @@ func UserServiceInit(r repo.UserRepo) UserServiceDepend {
 	return &UserService{r}
 }
 
-func (s *UserService) FindAll() ([]models.User, error) {
+func (s *UserService) FindAll() ([]models.Users, error) {
 	return s.service.FindAll()
 }
 
-func (s *UserService) CreateUser(user models.User) (models.User, error) {
+func (s *UserService) CreateUser(user models.Users) (models.Users, error) {
 	return s.service.CreateUser(user)
 }
 
-func (s *UserService) UpdateUser(user models.User, id int) (models.User, error) {
+func (s *UserService) UpdateUser(user models.Users, id int) (models.Users, error) {
 	return s.service.UpdateUser(user, id)
 }
 
-func (s *UserService) DeleteUser(user models.User, id int) error {
+func (s *UserService) DeleteUser(user models.Users, id int) error {
 	return s.service.DeleteUser(user, id)
 }
