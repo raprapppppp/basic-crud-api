@@ -15,8 +15,8 @@ type UserService struct {
 type UserServiceDepend interface {
 	FindAll() ([]models.Users, error)
 	CreateUser(user models.Users) (models.Users, error)
-	UpdateUser(user models.Users, id int) (models.Users, error)
-	DeleteUser(user models.Users, id int) error
+	UpdateUser(user models.Users) (models.Users, error)
+	DeleteUser(user models.Users) error
 }
 
 // Init
@@ -32,10 +32,14 @@ func (s *UserService) CreateUser(user models.Users) (models.Users, error) {
 	return s.service.CreateUser(user)
 }
 
-func (s *UserService) UpdateUser(user models.Users, id int) (models.Users, error) {
-	return s.service.UpdateUser(user, id)
+func (s *UserService) UpdateUser(user models.Users) (models.Users, error) {
+
+	id := user.ID
+	return s.service.UpdateUser(user, int(id))
 }
 
-func (s *UserService) DeleteUser(user models.Users, id int) error {
-	return s.service.DeleteUser(user, id)
+func (s *UserService) DeleteUser(user models.Users) error {
+
+	id := user.ID
+	return s.service.DeleteUser(user, int(id))
 }

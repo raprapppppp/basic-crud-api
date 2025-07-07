@@ -45,34 +45,26 @@ func (s *UserHandler) CreateUser(h *fiber.Ctx) error {
 }
 
 func (s *UserHandler) UpdateUser(h *fiber.Ctx) error {
-	id, err := h.ParamsInt("id")
 	var user models.Users
 
-	if err != nil {
-		h.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error":  "Invalid request data",
-			"detail": err.Error(),
-		})
-	}
 	errr := h.BodyParser(&user)
 	if errr != nil {
 		return h.Status(400).JSON(fiber.Map{"error": "Cannot parse JSON"})
 	}
-	updatedUser, _ := s.handler.UpdateUser(user, id)
+	updatedUser, _ := s.handler.UpdateUser(user)
 	fmt.Print(updatedUser)
 	return h.Status(fiber.StatusOK).JSON(updatedUser)
 }
 
 func (s *UserHandler) DeleteUser(h *fiber.Ctx) error {
-	id, err := h.ParamsInt("id")
 	var user models.Users
+
+	err := h.BodyParser(&user)
 
 	if err != nil {
 		return h.Status(400).JSON(fiber.Map{"error": "Cannot Can't Delete 1"})
-
 	}
-
-	errr := s.handler.DeleteUser(user, id)
+	errr := s.handler.DeleteUser(user)
 	if errr != nil {
 		return h.Status(400).JSON(fiber.Map{"error": "Cannot Can't Delete 2"})
 	}

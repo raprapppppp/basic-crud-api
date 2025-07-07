@@ -29,7 +29,7 @@ func NewUserRepository(db *gorm.DB) UserRepo {
 func (r *userDbRepo) FindAll() ([]models.Users, error) {
 	var user []models.Users
 
-	err := r.db.Find(&user).Error
+	err := r.db.Order("id asc").Find(&user).Error
 	return user, err
 }
 

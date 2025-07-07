@@ -24,10 +24,9 @@ func main() {
 	app.Use(cors.New())
 
 	app.Get("/users", userhandler.Getuser)
-	// app.Get("/users/:id", handlers.GetUserById)
 	app.Post("/users", userhandler.CreateUser)
-	app.Put("/users/update/:id", userhandler.UpdateUser)
-	app.Delete("/users/delete/:id", userhandler.DeleteUser)
+	app.Delete("/users/", userhandler.DeleteUser)
+	app.Put("/users/:id", userhandler.UpdateUser)
 
 	log.Fatal(app.Listen(":3001"))
 }
