@@ -30,12 +30,11 @@ func (s *UserHandler) Getuser(h *fiber.Ctx) error {
 }
 
 func (s *UserHandler) CreateUser(h *fiber.Ctx) error {
-	var user models.Users
+	user := new(models.Users)
 
-	if err := h.BodyParser(&user); err != nil {
-		return h.Status(400).JSON(fiber.Map{"error": "Cannot parse JSON"})
+	if err := h.BodyParser(user); err != nil {
+		return h.Status(500).JSON(fiber.Map{"error": "Cannot parse JSON"})
 	}
-
 	createdUser, err := s.handler.CreateUser(user)
 
 	if err != nil {

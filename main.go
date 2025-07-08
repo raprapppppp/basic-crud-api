@@ -1,32 +1,37 @@
 package main
 
 import (
-	"go_fiber/db"
-	"go_fiber/handlers"
-	"go_fiber/repo"
-	"go_fiber/services"
-	"log"
+	//"go_fiber/routes/api"
+	//"log"
+	//"github.com/gofiber/fiber/v2"
 
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
+	"fmt"
+	"go_fiber/crypt/util"
 )
 
 func main() {
-	dsn := "host=localhost user=postgres password=1234 dbname=employee port=5432 sslmode=disable"
-	db.ConnectionDB(dsn)
+	//app := fiber.New()
 
-	//Init
-	userRepo := repo.NewUserRepository(db.Database)
-	userService := services.UserServiceInit(userRepo)
-	userhandler := handlers.NewUserHandler(userService)
+	//api.Routes(app)
 
-	app := fiber.New()
-	app.Use(cors.New())
+	//log.Fatal(app.Listen(":3001"))
 
-	app.Get("/users", userhandler.Getuser)
-	app.Post("/users", userhandler.CreateUser)
-	app.Delete("/users/", userhandler.DeleteUser)
-	app.Put("/users/:id", userhandler.UpdateUser)
+	plainText := "Hello, World!"
+	fmt.Println("This is an original:", plainText)
 
-	log.Fatal(app.Listen(":3001"))
+	encrypted, err := util.GetAESEncrypted(plainText)
+
+	if err != nil {
+		fmt.Println("Error during encryption", err)
+	}
+
+	fmt.Println("This is an encrypted:", encrypted)
+
+	decrypted, err := util.GetAESDecrypted(encrypted)
+
+	if err != nil {
+		fmt.Println("Error during decryption", err)
+	}
+	fmt.Println("This is a decrypted:", string(decrypted))
+
 }

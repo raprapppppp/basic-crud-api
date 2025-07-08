@@ -10,7 +10,7 @@ import (
 type UserRepo interface {
 	FindAll() ([]models.Users, error)
 	//FindByID(id int) (models.User, error)
-	CreateUser(user models.Users) (models.Users, error)
+	CreateUser(user *models.Users) (models.Users, error)
 	UpdateUser(user models.Users, id int) (models.Users, error)
 	DeleteUser(user models.Users, id int) error
 }
@@ -33,11 +33,11 @@ func (r *userDbRepo) FindAll() ([]models.Users, error) {
 	return user, err
 }
 
-func (r *userDbRepo) CreateUser(user models.Users) (models.Users, error) {
+func (r *userDbRepo) CreateUser(user *models.Users) (models.Users, error) {
 
 	err := r.db.Create(&user).Error
 
-	return user, err
+	return *user, err
 }
 
 func (r *userDbRepo) UpdateUser(user models.Users, id int) (models.Users, error) {
