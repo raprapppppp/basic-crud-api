@@ -13,6 +13,9 @@ type UserRepo interface {
 	CreateUser(user *models.Users) (models.Users, error)
 	UpdateUser(user models.Users, id int) (models.Users, error)
 	DeleteUser(user models.Users, id int) error
+
+	CreateAccountService(account *models.Account) error
+	LoginUserAccountRepo() ([]models.Account, error)
 }
 
 // Inject DB
@@ -52,4 +55,22 @@ func (r *userDbRepo) DeleteUser(user models.Users, id int) error {
 	err := r.db.Delete(&user, id).Error
 
 	return err
+}
+
+func (r *userDbRepo) CreateAccountService(account *models.Account) error {
+
+	err := r.db.Create(&account).Error
+
+	return err
+}
+
+func (r *userDbRepo) LoginUserAccountRepo() ([]models.Account, error) {
+	var accounts []models.Account
+
+	err := r.db.Find(&accounts).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return accounts, nil
 }

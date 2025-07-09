@@ -17,3 +17,9 @@ type Users struct {
 	Birth       string `json:"birthdate"`
 	Phonenumber string `json:"phoneNumber"`
 }
+
+type Account struct {
+	ID       uint   `json:"id" gorm:"primaryKey;autoIncrement"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+}

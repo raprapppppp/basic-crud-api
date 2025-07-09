@@ -70,6 +70,42 @@ func (s *UserHandler) DeleteUser(h *fiber.Ctx) error {
 	return h.SendStatus(200)
 }
 
+func (s *UserHandler) CreateUserAccount(h *fiber.Ctx) error {
+	var account = new(models.Account)
+
+	err := h.BodyParser(account)
+	if err != nil {
+		return err
+	}
+
+	err = s.handler.CreateAccountService(account)
+	if err != nil {
+		return err
+	}
+	return h.SendStatus(200)
+}
+
+func (s *UserHandler) LoginUserAccount(h *fiber.Ctx) error {
+	var loginCredential models.Account
+
+	err := h.BodyParser(&loginCredential)
+	if err != nil {
+		return err
+	}
+
+	resultMatching, err := s.handler.LoginUserAccountService(loginCredential)
+
+	if err != nil {
+		return err
+	}
+	fmt.Print(resultMatching)
+	if !resultMatching {
+		return h.SendStatus((fiber.StatusUnauthorized))
+	}
+	return h.SendStatus(fiber.StatusOK)
+
+}
+
 // func Getuser(h *fiber.Ctx) error {
 // 	var users []models.User
 
