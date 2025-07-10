@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"go_fiber/models"
 	"go_fiber/services"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 // inject Interface serviceDependeciy
@@ -99,74 +101,35 @@ func (s *UserHandler) LoginUserAccount(h *fiber.Ctx) error {
 
 	resultMatching, err := s.handler.LoginUserAccountService(loginCredential)
 	if err != nil {
-		return h.Status(fiber.StatusConflict).JSON(fiber.Map{
+		return h.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"error": "user not found",
 		})
 	}
 
 	fmt.Print(resultMatching)
 	if !resultMatching {
-		return h.Status(fiber.StatusConflict).JSON(fiber.Map{
+		return h.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"error": "Incorrect username or Password",
 		})
 	}
-	return h.SendStatus(fiber.StatusOK)
 
+	// Create the Claims
+	claims := jwt.MapClaims{
+		"name":  "John Doe",
+		"admin": true,
+		"exp":   time.Now().Add(time.Hour * 72).Unix(),
+	}
+
+	// Create token
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	// Generate encoded token and send it as response.
+	t, err := token.SignedString([]byte("secret"))
+	if err != nil {
+		return h.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	return h.Status(fiber.StatusOK).JSON(fiber.Map{
+		"token": t,
+	})
 }
-
-// func Getuser(h *fiber.Ctx) error {
-// 	var users []models.User
-
-// 	db.Database.Find(&users)
-// 	return h.Status(fiber.StatusFound).JSON(users)
-// }
-
-// func GetUserById(h *fiber.Ctx) error {
-// 	id, _ := h.ParamsInt("id")
-
-// 	var user models.User
-
-// 	db.Database.Find(&user, id)
-
-// 	return h.Status(fiber.StatusOK).JSON(user)
-
-// }
-
-// func Adduser(h *fiber.Ctx) error {
-// 	user := new(models.User)
-
-// 	err := h.BodyParser(user)
-// 	if err != nil {
-// 		return h.Status(503).SendString(err.Error())
-// 	}
-// 	db.Database.Create(&user)
-
-// 	return h.Status(fiber.StatusOK).JSON(user)
-
-// }
-
-// func UpdateUser(h *fiber.Ctx) error {
-// 	user := new(models.User)
-// 	id, _ := h.ParamsInt("id")
-
-// 	err := h.BodyParser(user)
-// 	if err != nil {
-// 		return h.Status(504).SendString(err.Error())
-// 	}
-
-// 	db.Database.Where("id = ?", id).Updates(&user)
-// 	return h.Status(fiber.StatusOK).JSON(user)
-// }
-
-// func DeleteUser(h *fiber.Ctx) error {
-// 	id, _ := h.ParamsInt("id")
-// 	var user models.User
-
-// 	result := db.Database.Delete(&user, id)
-
-// 	if result.RowsAffected == 0 {
-// 		return h.SendStatus(404)
-// 	}
-// 	return h.SendStatus(200)
-
-// }
