@@ -80,9 +80,13 @@ func (s *UserHandler) CreateUserAccount(h *fiber.Ctx) error {
 
 	err = s.handler.CreateAccountService(account)
 	if err != nil {
-		return err
+		return h.Status(fiber.StatusConflict).JSON(fiber.Map{
+			"error": "username already exists",
+		})
 	}
-	return h.SendStatus(200)
+	return h.Status(fiber.StatusAccepted).JSON(fiber.Map{
+		"Alert": "Succesfully Created",
+	})
 }
 
 func (s *UserHandler) LoginUserAccount(h *fiber.Ctx) error {
@@ -94,13 +98,17 @@ func (s *UserHandler) LoginUserAccount(h *fiber.Ctx) error {
 	}
 
 	resultMatching, err := s.handler.LoginUserAccountService(loginCredential)
-
 	if err != nil {
-		return err
+		return h.Status(fiber.StatusConflict).JSON(fiber.Map{
+			"error": "user not found",
+		})
 	}
+
 	fmt.Print(resultMatching)
 	if !resultMatching {
-		return h.SendStatus((fiber.StatusUnauthorized))
+		return h.Status(fiber.StatusConflict).JSON(fiber.Map{
+			"error": "Incorrect username or Password",
+		})
 	}
 	return h.SendStatus(fiber.StatusOK)
 

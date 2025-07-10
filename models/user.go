@@ -20,6 +20,6 @@ type Users struct {
 
 type Account struct {
 	ID       uint   `json:"id" gorm:"primaryKey;autoIncrement"`
-	Username string `json:"username"`
+	Username string `json:"username" gorm:"unique"`
 	Password string `json:"password"`
 }

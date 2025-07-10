@@ -64,22 +64,22 @@ func (s *UserService) CreateAccountService(account *models.Account) error {
 }
 
 func (s *UserService) LoginUserAccountService(loginCredential models.Account) (bool, error) {
-	//Details from table
-	userAccounts, _ := s.service.LoginUserAccountRepo()
-
 	//Username and Password From input
 	uname := loginCredential.Username
 	pword := loginCredential.Password
 
-	var match bool
-	//Loop to check if the user INPUT match the login credentials on the table
-	for _, accts := range userAccounts {
-		if util.CompareHashAndPassword(accts.Password, pword) && accts.Username == uname {
-			match = true
-
-		} else {
-			match = false
-		}
+	//Details from table
+	userAccounts, err := s.service.LoginUserAccountRepo(uname)
+	if err != nil {
+		return false, err
 	}
-	return match, nil
+
+	isMatch := util.CompareHashAndPassword(userAccounts.Password, pword)
+
+	if !isMatch && userAccounts.Username != pword {
+		return false, nil
+	}
+
+	return true, nil
+
 }
