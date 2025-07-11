@@ -72,6 +72,7 @@ func (s *UserHandler) DeleteUser(h *fiber.Ctx) error {
 	return h.SendStatus(200)
 }
 
+// Creating accoutn for login
 func (s *UserHandler) CreateUserAccount(h *fiber.Ctx) error {
 	var account = new(models.Account)
 
@@ -91,6 +92,7 @@ func (s *UserHandler) CreateUserAccount(h *fiber.Ctx) error {
 	})
 }
 
+// After login EU get token
 func (s *UserHandler) LoginUserAccount(h *fiber.Ctx) error {
 	var loginCredential models.Account
 
@@ -128,6 +130,18 @@ func (s *UserHandler) LoginUserAccount(h *fiber.Ctx) error {
 	if err != nil {
 		return h.SendStatus(fiber.StatusInternalServerError)
 	}
+
+	//Creating Cookies struct may other way setcookie
+	h.Cookie(&fiber.Cookie{
+		Name:     "token",
+		Value:    t,
+		Expires:  time.Now().Add(24 * time.Hour),
+		HTTPOnly: true,
+		Secure:   false,
+		SameSite: "Lax",
+	})
+
+	fmt.Print(t)
 
 	return h.Status(fiber.StatusOK).JSON(fiber.Map{
 		"token": t,

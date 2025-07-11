@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"errors"
 	"go_fiber/models"
 
 	"gorm.io/gorm"
@@ -61,15 +62,20 @@ func (r *userDbRepo) CreateAccountService(account *models.Account) error {
 
 	err := r.db.Create(&account).Error
 
+	if err != nil {
+		return errors.New("username already exist")
+	}
 	return err
 }
 
 func (r *userDbRepo) LoginUserAccountRepo(account string) (models.Account, error) {
 	var accounts models.Account
 
+	var notFoundError = errors.New("user not found")
+
 	err := r.db.Find(&accounts, "username = ?", account).Error
 	if err != nil {
-		return models.Account{}, err
+		return models.Account{}, notFoundError
 	}
 	return accounts, nil
 }
