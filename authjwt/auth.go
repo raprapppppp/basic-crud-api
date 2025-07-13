@@ -2,6 +2,7 @@ package authjwt
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt"
@@ -10,7 +11,14 @@ import (
 func AuthHeaderMiddleware(c *fiber.Ctx) error {
 
 	authHeader := c.Get("Authorization")
-	token, err := jwt.Parse(authHeader, func(t *jwt.Token) (interface{}, error) {
+
+	if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
+		return c.Status(fiber.StatusUnauthorized).SendString("Missing or invalid Authorization header")
+	}
+
+	extractedToken := strings.TrimPrefix(authHeader, "Bearer ")
+
+	token, err := jwt.Parse(extractedToken, func(t *jwt.Token) (interface{}, error) {
 		return []byte("secret"), nil
 	})
 	if err != nil || !token.Valid {
@@ -31,8 +39,13 @@ func AuthCookiesMiddleware(c *fiber.Ctx) error {
 	}
 
 	token, err := jwt.Parse(cookie, func(t *jwt.Token) (interface{}, error) {
+		_, ok := t.Method.(*jwt.SigningMethodHMAC)
+		if !ok {
+			return nil, fiber.NewError(fiber.StatusUnauthorized, "Invalid signing method")
+		}
 		return []byte("secret"), nil
 	})
+
 	if err != nil || !token.Valid {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"error": "Invalid token",

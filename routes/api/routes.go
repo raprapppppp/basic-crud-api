@@ -27,11 +27,12 @@ func Routes(route fiber.Router) {
 	route.Post("/account/create", userhandler.CreateUserAccount)
 	route.Post("/account/login", userhandler.LoginUserAccount)
 
+	//Input your auth Middleware in this to protect route
 	app := route.Group("/api", authjwt.AuthCookiesMiddleware)
 
 	app.Get("/", userhandler.Getuser)
 	app.Post("/", userhandler.CreateUser)
 	app.Delete("/", userhandler.DeleteUser)
-	app.Put("/:id", userhandler.UpdateUser)
+	app.Put("/", userhandler.UpdateUser)
 
 }

@@ -131,6 +131,7 @@ func (s *UserHandler) LoginUserAccount(h *fiber.Ctx) error {
 		return h.SendStatus(fiber.StatusInternalServerError)
 	}
 
+	fmt.Print(t)
 	//Creating Cookies struct may other way setcookie
 	h.Cookie(&fiber.Cookie{
 		Name:     "token",
@@ -141,9 +142,11 @@ func (s *UserHandler) LoginUserAccount(h *fiber.Ctx) error {
 		SameSite: "Lax",
 	})
 
-	fmt.Print(t)
-
 	return h.Status(fiber.StatusOK).JSON(fiber.Map{
-		"token": t,
+		"alert": "succesfull login",
 	})
+
+	/* return h.Status(fiber.StatusOK).JSON(fiber.Map{
+		"token": t,
+	}) */
 }
