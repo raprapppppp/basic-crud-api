@@ -34,5 +34,6 @@ func Routes(route fiber.Router) {
 	app.Post("/", userhandler.CreateUser)
 	app.Delete("/", userhandler.DeleteUser)
 	app.Put("/", userhandler.UpdateUser)
+	app.Post("/logout", handlers.LogoutUser)
 
 }

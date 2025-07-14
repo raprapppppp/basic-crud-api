@@ -150,3 +150,18 @@ func (s *UserHandler) LoginUserAccount(h *fiber.Ctx) error {
 		"token": t,
 	}) */
 }
+
+func LogoutUser(h *fiber.Ctx) error {
+	h.Cookie(&fiber.Cookie{
+		Name:     "token",
+		Value:    "",
+		Expires:  time.Now().Add(-time.Hour),
+		MaxAge:   -1,
+		HTTPOnly: true,
+		Secure:   false,
+		SameSite: "Lax",
+	})
+
+	return h.SendStatus(fiber.StatusOK)
+
+}
