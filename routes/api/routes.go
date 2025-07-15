@@ -20,7 +20,7 @@ func Routes(route fiber.Router) {
 	userhandler := handlers.NewUserHandler(userService)
 
 	route.Use(cors.New(cors.Config{
-		AllowOrigins:     "http://localhost:3000", // Your Next.js frontend
+		AllowOrigins:     "http://localhost:3001", // Your Next.js frontend
 		AllowCredentials: true,
 	}))
 
