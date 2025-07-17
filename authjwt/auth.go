@@ -52,8 +52,8 @@ func AuthCookiesMiddleware(c *fiber.Ctx) error {
 			"error": "Invalid token",
 		})
 	}
-	claims := token.Claims.(jwt.MapClaims)
-	fmt.Print(claims)
+	/* claims := token.Claims.(jwt.MapClaims)
+	fmt.Print(claims["admin"]) */
 	return c.Next()
 
 }
