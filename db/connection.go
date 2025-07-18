@@ -20,13 +20,15 @@ func ConnectionDB() error {
 		config.Config("DB_HOST"), config.Config("DB_USER"), config.Config("DB_PASSWORD"), config.Config("DB_NAME"), config.Config("DB_PORT"))
 
 	var err error
-	Database, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		SkipDefaultTransaction: true,
 		PrepareStmt:            true,
 	})
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
+
+	Database = db
 	//Database.AutoMigrate(&models.User{})
 	Database.AutoMigrate(&models.Users{})
 	Database.AutoMigrate(&models.Account{})
