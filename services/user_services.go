@@ -20,8 +20,8 @@ type UserServiceDepend interface {
 	UpdateUser(user models.Users) (models.Users, error)
 	DeleteUser(user models.Users) error
 
-	CreateAccountService(account *models.Account) error
-	LoginUserAccountService(loginCredential models.Account) (bool, error)
+	CreateAccountService(account *models.Account) (string, error)
+	LoginUserAccountService(loginCredential models.Account) (models.Account, string)
 }
 
 // Init
@@ -50,36 +50,38 @@ func (s *UserService) DeleteUser(user models.Users) error {
 	return s.service.DeleteUser(user, int(id))
 }
 
-func (s *UserService) CreateAccountService(account *models.Account) error {
+func (s *UserService) CreateAccountService(account *models.Account) (string, error) {
 
 	fmt.Print(account)
 
-	passToHash := account.Password
-	fmt.Print(passToHash)
-	//Pass user input password to encrypt
-	account.Password = util.HashPassword(passToHash)
-	fmt.Print(account)
+	isExist := s.service.CheckUsernameAlreadyExist(account.Username)
+	if isExist {
+		return "Exist",nil
+	}
 
-	return s.service.CreateAccountService(account)
+	account.Password = util.HashPassword(account.Password)
+	err := s.service.CreateAccountService(account)
+	if err != nil {
+		return "",err
+	}
+	return "Created", nil
 }
 
-func (s *UserService) LoginUserAccountService(loginCredential models.Account) (bool, error) {
-	//Username and Password From input
-	uname := loginCredential.Username
-	pword := loginCredential.Password
+func (s *UserService) LoginUserAccountService(loginCredential models.Account) (models.Account, string) {
+	
+	isAlreadyExist := s.service.CheckUsernameAlreadyExist(loginCredential.Username)
+	if !isAlreadyExist {
+		return models.Account{}, "User Does not exist exist"
+	}
 
-	//Details from table
-	userAccounts, err := s.service.LoginUserAccountRepo(uname)
+	acc, err := s.service.LoginUserAccountRepo(loginCredential.Username)
 	if err != nil {
-		return false, err
+		return models.Account{}, err.Error()
 	}
 
-	isMatch := util.CompareHashAndPassword(userAccounts.Password, pword)
-
-	if !isMatch && userAccounts.Username != pword {
-		return false, nil
+	isMatch := util.CompareHashAndPassword(acc.Password, loginCredential.Password)
+	if !isMatch {
+		return models.Account{}, "Password does not match"
 	}
-
-	return true, nil
-
+	return acc, "Account match"
 }

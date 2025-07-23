@@ -22,4 +22,5 @@ type Account struct {
 	ID       uint   `json:"id" gorm:"primaryKey;autoIncrement"`
 	Username string `json:"username" gorm:"unique"`
 	Password string `json:"password"`
+	Role     string `json:"role" gorm:"type:text;default:'user'';not null"`
 }

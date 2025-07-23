@@ -17,6 +17,7 @@ type UserRepo interface {
 
 	CreateAccountService(account *models.Account) error
 	LoginUserAccountRepo(username string) (models.Account, error)
+	CheckUsernameAlreadyExist(username string) bool
 }
 
 // Inject DB
@@ -78,4 +79,17 @@ func (r *userDbRepo) LoginUserAccountRepo(account string) (models.Account, error
 		return models.Account{}, notFoundError
 	}
 	return accounts, nil
+}
+
+func (r *userDbRepo) CheckUsernameAlreadyExist(username string) bool {
+	var user models.Account
+	var count int64
+
+	r.db.Model(&user).Where("Username = ?", username).Count(&count)
+
+	if count > 0 {
+		return true
+	} else {
+		return false
+	}
 }

@@ -79,18 +79,21 @@ func (s *UserHandler) CreateUserAccount(h *fiber.Ctx) error {
 
 	err := h.BodyParser(account)
 	if err != nil {
-		return err
-	}
-
-	err = s.handler.CreateAccountService(account)
-	if err != nil {
-		return h.Status(fiber.StatusConflict).JSON(fiber.Map{
-			"error": "username already exists",
+		return h.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "404 Invalid request body",
 		})
 	}
-	return h.Status(fiber.StatusAccepted).JSON(fiber.Map{
-		"Alert": "Succesfully Created",
-	})
+
+	mess, err := s.handler.CreateAccountService(account)
+	if err != nil {
+		return err
+	}
+	if mess == "Exist" {
+		return h.Status(fiber.StatusNotAcceptable).JSON(fiber.Map{
+			"error": "Already Exist",
+		})
+	}
+	return h.SendStatus(fiber.StatusAccepted)
 }
 
 // After login EU get token
@@ -102,24 +105,31 @@ func (s *UserHandler) LoginUserAccount(h *fiber.Ctx) error {
 		return err
 	}
 
-	resultMatching, err := s.handler.LoginUserAccountService(loginCredential)
-	if err != nil {
+	resultMatching, mess  := s.handler.LoginUserAccountService(loginCredential)
+	switch mess {
+	case "User Does not exist exist":
 		return h.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"error": "user not found",
+			"error": 404,
 		})
-	}
 
-	fmt.Print(resultMatching)
-	if !resultMatching {
-		return h.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"error": "Incorrect username or Password",
+	case "Error in Database":
+		return h.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": 500,
 		})
+
+	case "Password does not match":
+		return h.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": 401,
+		})
+
+	case "Account match":
 	}
 
 	// Create the Claims
 	claims := jwt.MapClaims{
-		"name":  "rafael eyy",
-		"admin": true,
+		"id" : resultMatching.ID,
+		"username":  resultMatching.Username,
+		"role": resultMatching.Role,
 		"exp":   time.Now().Add(time.Minute * 60).Unix(),
 	}
 
