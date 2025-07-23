@@ -90,10 +90,12 @@ func (s *UserHandler) CreateUserAccount(h *fiber.Ctx) error {
 	}
 	if mess == "Exist" {
 		return h.Status(fiber.StatusNotAcceptable).JSON(fiber.Map{
-			"error": "Already Exist",
+			"error": 406,
 		})
 	}
-	return h.SendStatus(fiber.StatusAccepted)
+	return h.Status(fiber.StatusAccepted).JSON(fiber.Map{
+		"message": 200,
+	})
 }
 
 // After login EU get token
@@ -105,7 +107,7 @@ func (s *UserHandler) LoginUserAccount(h *fiber.Ctx) error {
 		return err
 	}
 
-	resultMatching, mess  := s.handler.LoginUserAccountService(loginCredential)
+	resultMatching, mess := s.handler.LoginUserAccountService(loginCredential)
 	switch mess {
 	case "User Does not exist exist":
 		return h.Status(fiber.StatusNotFound).JSON(fiber.Map{
@@ -127,10 +129,10 @@ func (s *UserHandler) LoginUserAccount(h *fiber.Ctx) error {
 
 	// Create the Claims
 	claims := jwt.MapClaims{
-		"id" : resultMatching.ID,
-		"username":  resultMatching.Username,
-		"role": resultMatching.Role,
-		"exp":   time.Now().Add(time.Minute * 60).Unix(),
+		"id":       resultMatching.ID,
+		"username": resultMatching.Username,
+		"role":     resultMatching.Role,
+		"exp":      time.Now().Add(time.Minute * 60).Unix(),
 	}
 
 	// Create token
@@ -154,7 +156,7 @@ func (s *UserHandler) LoginUserAccount(h *fiber.Ctx) error {
 	})
 
 	return h.Status(fiber.StatusOK).JSON(fiber.Map{
-		"alert": "succesfull login",
+		"alert": 200,
 	})
 
 	/* return h.Status(fiber.StatusOK).JSON(fiber.Map{
