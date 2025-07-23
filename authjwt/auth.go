@@ -24,7 +24,7 @@ func AuthHeaderMiddleware(c *fiber.Ctx) error {
 	})
 	if err != nil || !token.Valid {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"error": "Invalid token",
+		"error": "Invalid token",
 		})
 	}
 	claims := token.Claims.(jwt.MapClaims)
