@@ -2,6 +2,7 @@ package authjwt
 
 import (
 	"fmt"
+	"go_fiber/config"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
@@ -43,7 +44,7 @@ func AuthCookiesMiddleware(c *fiber.Ctx) error {
 		if !ok {
 			return nil, fiber.NewError(fiber.StatusUnauthorized, "Invalid signing method")
 		}
-		return []byte("secret"), nil
+		return []byte(config.Config("COOKIES_SECRET_KEY")), nil
 	})
 
 	if err != nil || !token.Valid {
@@ -51,8 +52,8 @@ func AuthCookiesMiddleware(c *fiber.Ctx) error {
 			"error": "Invalid token",
 		})
 	}
-	claims := token.Claims.(jwt.MapClaims)
-	fmt.Print(claims)
+	/* claims := token.Claims.(jwt.MapClaims)
+	fmt.Print(claims["admin"]) */
 	return c.Next()
 
 }

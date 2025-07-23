@@ -4,6 +4,7 @@ import (
 	//	"go_fiber/db"
 	//	"go_fiber/models"
 	"fmt"
+	"go_fiber/config"
 	"go_fiber/models"
 	"go_fiber/services"
 	"time"
@@ -117,16 +118,16 @@ func (s *UserHandler) LoginUserAccount(h *fiber.Ctx) error {
 
 	// Create the Claims
 	claims := jwt.MapClaims{
-		"name":  "John Doe",
+		"name":  "rafael eyy",
 		"admin": true,
-		"exp":   time.Now().Add(time.Hour * 72).Unix(),
+		"exp":   time.Now().Add(time.Minute * 60).Unix(),
 	}
 
 	// Create token
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	// Generate encoded token and send it as response.
-	t, err := token.SignedString([]byte("secret"))
+	t, err := token.SignedString([]byte(config.Config("COOKIES_SECRET_KEY")))
 	if err != nil {
 		return h.SendStatus(fiber.StatusInternalServerError)
 	}
@@ -136,7 +137,7 @@ func (s *UserHandler) LoginUserAccount(h *fiber.Ctx) error {
 	h.Cookie(&fiber.Cookie{
 		Name:     "token",
 		Value:    t,
-		Expires:  time.Now().Add(24 * time.Hour),
+		Expires:  time.Now().Add(60 * time.Minute),
 		HTTPOnly: true,
 		Secure:   false,
 		SameSite: "Lax",
