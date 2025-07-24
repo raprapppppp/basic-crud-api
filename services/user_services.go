@@ -2,7 +2,6 @@
 package services
 
 import (
-	"fmt"
 	"go_fiber/crypt/util"
 	"go_fiber/models"
 	"go_fiber/repo"
@@ -28,7 +27,7 @@ type UserServiceDepend interface {
 	//Task
 	CreateTaskService(task models.Task) (models.Task, error)
 	GetTaskService(id int) ([]models.Task, error)
-	DeleteTaskService(tasl models.Task)(string, error)
+	DeleteTaskService(tasl models.Task) (string, error)
 	UpdateTaskService(task models.Task) (models.Task, error)
 }
 
@@ -60,23 +59,21 @@ func (s *UserService) DeleteUser(user models.Users) error {
 
 func (s *UserService) CreateAccountService(account *models.Account) (string, error) {
 
-	fmt.Print(account)
-
 	isExist := s.service.CheckUsernameAlreadyExist(account.Username)
 	if isExist {
-		return "Exist",nil
+		return "Exist", nil
 	}
 
 	account.Password = util.HashPassword(account.Password)
 	err := s.service.CreateAccountService(account)
 	if err != nil {
-		return "",err
+		return "", err
 	}
 	return "Created", nil
 }
 
 func (s *UserService) LoginUserAccountService(loginCredential models.Account) (models.Account, string) {
-	
+
 	isAlreadyExist := s.service.CheckUsernameAlreadyExist(loginCredential.Username)
 	if !isAlreadyExist {
 		return models.Account{}, "User Does not exist exist"
@@ -98,19 +95,19 @@ func (s *UserService) GetProfileService(id int) (models.Account, error) {
 	return s.service.GetProfileRepo(id)
 }
 
-//Task
-//Create
-func(s *UserService) CreateTaskService(task models.Task) (models.Task, error){
+// Task
+// Create
+func (s *UserService) CreateTaskService(task models.Task) (models.Task, error) {
 	return s.service.CreateTaskRepo(task)
 }
 
-//Get
-func(s *UserService) GetTaskService(id int) ([]models.Task, error){
+// Get
+func (s *UserService) GetTaskService(id int) ([]models.Task, error) {
 	return s.service.GetTaskRepo(id)
 }
-		
-//Delete
-func(s *UserService) DeleteTaskService(task models.Task)(string, error){
+
+// Delete
+func (s *UserService) DeleteTaskService(task models.Task) (string, error) {
 	err := s.service.DeleteTaskRepo(task)
 	if err != nil {
 		return "", err
@@ -118,7 +115,7 @@ func(s *UserService) DeleteTaskService(task models.Task)(string, error){
 	return "Deleted", nil
 }
 
-//Update
-func(s *UserService) UpdateTaskService(task models.Task) (models.Task, error){
+// Update
+func (s *UserService) UpdateTaskService(task models.Task) (models.Task, error) {
 	return s.service.UpdateTaskRepo(task)
 }

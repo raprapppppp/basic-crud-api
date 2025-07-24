@@ -28,19 +28,19 @@ func Routes(route fiber.Router) {
 	route.Post("/account/login", userhandler.LoginUserAccount)
 
 	//Input your auth Middleware in this to protect route
-	app := route.Group("/api", authjwt.RoleBasedMiddleware("user","admin"))
+	app := route.Group("/api", authjwt.RoleBasedMiddleware("admin"))
 	app.Get("/", userhandler.Getuser)
 	app.Post("/", userhandler.CreateUser)
 	app.Delete("/", userhandler.DeleteUser)
 	app.Put("/", userhandler.UpdateUser)
-	app.Post("/logout", handlers.LogoutUser)
 
-	route.Get("/get/profile" ,authjwt.AuthCookiesMiddleware ,userhandler.GetProfileHandler)
+	route.Get("/get/profile", authjwt.AuthCookiesMiddleware, userhandler.GetProfileHandler)
 
-	taskGroup := app.Group("/task", authjwt.AuthCookiesMiddleware)
+	taskGroup := route.Group("/task", authjwt.AuthCookiesMiddleware)
 	taskGroup.Post("/create", userhandler.CreateTaskHandler)
 	taskGroup.Get("/get", userhandler.GetTaskHandler)
 	taskGroup.Delete("/delete", userhandler.DeleteTaskHandler)
 	taskGroup.Put("/update", userhandler.UpdateTaskHandler)
+	taskGroup.Post("/logout", handlers.LogoutUser)
 
 }
