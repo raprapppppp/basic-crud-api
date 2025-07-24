@@ -22,6 +22,14 @@ type UserServiceDepend interface {
 
 	CreateAccountService(account *models.Account) (string, error)
 	LoginUserAccountService(loginCredential models.Account) (models.Account, string)
+
+	GetProfileService(id int) (models.Account, error)
+
+	//Task
+	CreateTaskService(task models.Task) (models.Task, error)
+	GetTaskService(id int) ([]models.Task, error)
+	DeleteTaskService(tasl models.Task)(string, error)
+	UpdateTaskService(task models.Task) (models.Task, error)
 }
 
 // Init
@@ -84,4 +92,33 @@ func (s *UserService) LoginUserAccountService(loginCredential models.Account) (m
 		return models.Account{}, "Password does not match"
 	}
 	return acc, "Account match"
+}
+
+func (s *UserService) GetProfileService(id int) (models.Account, error) {
+	return s.service.GetProfileRepo(id)
+}
+
+//Task
+//Create
+func(s *UserService) CreateTaskService(task models.Task) (models.Task, error){
+	return s.service.CreateTaskRepo(task)
+}
+
+//Get
+func(s *UserService) GetTaskService(id int) ([]models.Task, error){
+	return s.service.GetTaskRepo(id)
+}
+		
+//Delete
+func(s *UserService) DeleteTaskService(task models.Task)(string, error){
+	err := s.service.DeleteTaskRepo(task)
+	if err != nil {
+		return "", err
+	}
+	return "Deleted", nil
+}
+
+//Update
+func(s *UserService) UpdateTaskService(task models.Task) (models.Task, error){
+	return s.service.UpdateTaskRepo(task)
 }

@@ -41,7 +41,7 @@ func (s *UserHandler) CreateUser(h *fiber.Ctx) error {
 	createdUser, err := s.handler.CreateUser(user)
 
 	if err != nil {
-		return h.Status(500).JSON(fiber.Map{"error": err.Error()})
+		return h.Status(500).JSON(fiber.Map{"error": 500})
 	}
 	return h.Status(fiber.StatusAccepted).JSON(createdUser)
 }
@@ -176,5 +176,110 @@ func LogoutUser(h *fiber.Ctx) error {
 	})
 
 	return h.SendStatus(fiber.StatusOK)
-
 }
+//
+func (s *UserHandler) GetProfileHandler(h *fiber.Ctx) error {
+
+	//Get the id from claims that store in locals
+	id := h.Locals("id")
+	if id == nil {
+		return h.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
+	}
+	//convert to float and to int before passing
+	idFloat, ok := id.(float64)
+	if !ok {
+		return h.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Invalid user ID type"})
+	}
+
+	profile, err := s.handler.GetProfileService(int(idFloat))
+	if err != nil {
+		return h.Status(500).JSON(fiber.Map{"error": err.Error()})
+	}
+	return h.Status(fiber.StatusOK).JSON(profile)
+}
+
+//Task handler
+//Create Task
+func (h *UserHandler) CreateTaskHandler(t *fiber.Ctx) error{
+	var task models.Task
+
+	err := t.BodyParser(&task)
+	if err != nil {
+		return t.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Failed to parse request"}) 
+	}
+
+	userId := t.Locals("id")
+	if userId == nil {
+		return t.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
+	}
+
+	idFloat, ok := userId.(float64)
+	if !ok {
+		return t.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Invalid user ID type"})
+	}
+
+	task.AccountId = uint(idFloat)
+
+	tasks, err := h.handler.CreateTaskService(task)
+	if err !=nil {
+		return t.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+		"error": err.Error(),
+	})
+	}
+	return t.Status(fiber.StatusOK).JSON(tasks)
+}
+
+//Get Task
+func (h *UserHandler) GetTaskHandler(t *fiber.Ctx) error {
+	userId := t.Locals("id")
+	if userId == nil {
+		return t.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
+	}
+
+	idFloat, ok := userId.(float64)
+	if !ok {
+		return t.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Invalid user ID type"})
+	}
+
+	tasks, err := h.handler.GetTaskService(int(idFloat))
+	if err != nil {
+		return err
+	}
+
+	return t.Status(fiber.StatusOK).JSON(tasks)
+}
+
+//Delete
+func (h *UserHandler) DeleteTaskHandler(t *fiber.Ctx) error {
+	var task models.Task
+
+	err := t.BodyParser(&task)
+	if err != nil{
+		return t.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Failed to parse request"}) 
+	}
+
+	mess,err := h.handler.DeleteTaskService(task)
+
+	if err != nil {
+		return err
+	}
+
+	return t.Status(fiber.StatusOK).JSON(fiber.Map{"error": mess}) 
+}
+
+//Update
+func (h *UserHandler) UpdateTaskHandler(t *fiber.Ctx) error {
+	var task models.Task
+
+	err := t.BodyParser(&task)
+	if err != nil {
+		return t.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Failed to parse request"}) 
+	}
+
+	upTask, err := h.handler.UpdateTaskService(task)
+	if err != nil {
+		return err
+	}
+	return t.Status(fiber.StatusOK).JSON(upTask)
+}
+
