@@ -11,7 +11,7 @@ import (
 type UserRepo interface {
 	FindAll() ([]models.Users, error)
 	//FindByID(id int) (models.User, error)
-	CreateUser(user *models.Users) (models.Users, error)
+	CreateUser(user models.Users) (models.Users, error)
 	UpdateUser(user models.Users, id int) (models.Users, error)
 	DeleteUser(user models.Users, id int) error
 
@@ -25,6 +25,8 @@ type UserRepo interface {
 	GetTaskRepo(id int) ([]models.Task, error)
 	DeleteTaskRepo(task models.Task) error
 	UpdateTaskRepo(task models.Task) (models.Task, error)
+
+	 CheckEmailIfExist(user models.Users) bool
 }
 
 // Inject DB
@@ -45,11 +47,21 @@ func (r *userDbRepo) FindAll() ([]models.Users, error) {
 	return user, err
 }
 
-func (r *userDbRepo) CreateUser(user *models.Users) (models.Users, error) {
+func (r *userDbRepo) CreateUser(user models.Users) (models.Users, error) {
 
 	err := r.db.Create(&user).Error
 
-	return *user, err
+	return user, err
+}
+
+func (r *userDbRepo) CheckEmailIfExist(user models.Users) bool {
+	var count int64
+	r.db.Model(&user).Where("email = ?", user.Email).Count(&count)
+	if count > 0 {
+		return true
+	} else {
+		return false
+	}
 }
 
 func (r *userDbRepo) UpdateUser(user models.Users, id int) (models.Users, error) {

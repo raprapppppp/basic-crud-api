@@ -33,14 +33,14 @@ func (s *UserHandler) Getuser(h *fiber.Ctx) error {
 }
 
 func (s *UserHandler) CreateUser(h *fiber.Ctx) error {
-	user := new(models.Users)
+	var user models.Users
 
-	if err := h.BodyParser(user); err != nil {
+	if err := h.BodyParser(&user); err != nil {
 		return h.Status(500).JSON(fiber.Map{"error": "Cannot parse JSON"})
 	}
-	createdUser, err := s.handler.CreateUser(user)
+	createdUser, mess := s.handler.CreateUserService(user)
 
-	if err != nil {
+	if mess == "Email exist" {
 		return h.Status(500).JSON(fiber.Map{"error": 500})
 	}
 	return h.Status(fiber.StatusAccepted).JSON(createdUser)
@@ -143,8 +143,6 @@ func (s *UserHandler) LoginUserAccount(h *fiber.Ctx) error {
 	if err != nil {
 		return h.SendStatus(fiber.StatusInternalServerError)
 	}
-
-	fmt.Print(t)
 	//Creating Cookies struct may other way setcookie
 	h.Cookie(&fiber.Cookie{
 		Name:     "token",

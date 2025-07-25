@@ -15,7 +15,7 @@ type UserService struct {
 // interfaces contains all mthod available on services
 type UserServiceDepend interface {
 	FindAll() ([]models.Users, error)
-	CreateUser(user *models.Users) (models.Users, error)
+	CreateUserService(user models.Users) (models.Users, string)
 	UpdateUser(user models.Users) (models.Users, error)
 	DeleteUser(user models.Users) error
 
@@ -40,9 +40,16 @@ func (s *UserService) FindAll() ([]models.Users, error) {
 	return s.service.FindAll()
 }
 
-func (s *UserService) CreateUser(user *models.Users) (models.Users, error) {
-
-	return s.service.CreateUser(user)
+func (s *UserService) CreateUserService(user models.Users) (models.Users, string) {
+	emailExist := s.service.CheckEmailIfExist(user)
+	if emailExist {
+	return models.Users{} , "Email exist"
+	}
+	user , err := s.service.CreateUser(user)
+	if err != nil {
+		return models.Users{}, "error"
+	}
+	return user , ""
 }
 
 func (s *UserService) UpdateUser(user models.Users) (models.Users, error) {
